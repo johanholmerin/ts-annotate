@@ -8,6 +8,10 @@ function findType(entries, start) {
   return entries.find(({ offset }) => offset === start);
 }
 
+function createUnion(types) {
+  return types.join(' | ');
+}
+
 async function main() {
   const map = require(process.argv[2]);
 
@@ -18,10 +22,21 @@ async function main() {
 
     traverse(ast, {
       FunctionDeclaration(path) {
+        const returnType = findType(entries, path.node.end - 1);
+        let funcEnd = path.node.body.start;
+        // Explicit support for the common case of a space between ) & {
+        if (code[funcEnd - 1] === ' ') {
+          funcEnd--;
+        }
+        if (returnType) {
+          let dec = `: ${createUnion(returnType.types)}`;
+          ms.appendLeft(funcEnd, dec);
+        }
+
         path.node.params.forEach((param) => {
           const type = findType(entries, param.start);
           if (type) {
-            const dec = `: ${type.types.join(' | ')}`;
+            const dec = `: ${createUnion(type.types)}`;
             ms.appendRight(param.end, dec);
           }
         });

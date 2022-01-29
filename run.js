@@ -9,6 +9,11 @@ const TS_TYPE_MAP = {
   Module: 'Record<string, any>',
   Object: 'Record<string, any>',
   Array: 'any[]',
+  Promise: 'Promise<any>',
+  Set: 'Set<any>',
+  Map: 'Map<any, any>',
+  WeakSet: 'WeakSet<any>',
+  WeakMap: 'WeakMap<any, any>',
 };
 
 function post(method) {
@@ -37,10 +42,12 @@ async function main() {
       .filter(({ url }) => url.startsWith(`file://${process.cwd()}`))
       .map(({ url, entries }) => ({
         url: url.slice('file://'.length),
-        entries: entries.map(({ offset, types }) => ({
-          offset,
-          types: types.map(({ name }) => TS_TYPE_MAP[name] ?? name),
-        })),
+        entries: entries
+          .map(({ offset, types }) => ({
+            offset,
+            types: types.map(({ name }) => TS_TYPE_MAP[name] ?? name),
+          }))
+          .sort((a, b) => a.offset - b.offset),
       }));
 
     console.log(JSON.stringify(filtered, null, 2));
