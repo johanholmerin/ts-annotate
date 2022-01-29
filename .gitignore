@@ -1,4 +1,4 @@
-example/map.json
 node_modules
 .DS_Store
 *.log*
+ts-annotate-map.json

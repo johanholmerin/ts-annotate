@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+
+const path = require('path');
+const { program } = require('commander');
+const pkg = require('../package.json');
+const { run } = require('../run.js');
+const { apply } = require('../apply.js');
+
+// prettier-ignore
+program
+  .name(pkg.name)
+  .description(pkg.description)
+  .version(pkg.version);
+
+program
+  .command('run')
+  .description('Runs <file> and saves profile data to ts-annotate-map.json')
+  .argument('<file>')
+  .action((file) => {
+    const absolutePath = path.resolve(file);
+    run(absolutePath).catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+  });
+
+program
+  .command('apply')
+  .description(
+    'Adds type annotations to <files> using data from ts-annotate-map.json'
+  )
+  .argument('<files>')
+  .action((_, __, { args }) => {
+    const absolutePaths = args.map((arg) => path.resolve(arg));
+    apply(absolutePaths).catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+  });
+
+program.parse();

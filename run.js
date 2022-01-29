@@ -1,5 +1,6 @@
-#!/usr/bin/env node
+const path = require('path');
 const inspector = require('inspector');
+const fs = require('fs/promises');
 
 const session = new inspector.Session();
 session.connect();
@@ -28,35 +29,36 @@ function post(method) {
   });
 }
 
-async function main() {
+async function run(scriptPath) {
+  let exited = false;
+
   await post('Profiler.enable');
   await post('Profiler.start');
   await post('Profiler.startTypeProfile');
 
   process.on('beforeExit', async () => {
+    if (exited) return;
+    exited = true;
+
     const { result } = await post('Profiler.takeTypeProfile');
 
     await post('Profiler.stop');
 
-    const filtered = result
-      .filter(({ url }) => url.startsWith(`file://${process.cwd()}`))
-      .map(({ url, entries }) => ({
-        url: url.slice('file://'.length),
-        entries: entries
-          .map(({ offset, types }) => ({
-            offset,
-            types: types.map(({ name }) => TS_TYPE_MAP[name] ?? name),
-          }))
-          .sort((a, b) => a.offset - b.offset),
-      }));
+    const filtered = result.map(({ url, entries }) => ({
+      url: url.slice('file://'.length),
+      entries: entries.map(({ offset, types }) => ({
+        offset,
+        types: types.map(({ name }) => TS_TYPE_MAP[name] ?? name),
+      })),
+    }));
 
-    console.log(JSON.stringify(filtered, null, 2));
+    await fs.writeFile(
+      path.resolve(process.cwd(), './ts-annotate-map.json'),
+      JSON.stringify(filtered, null, 2)
+    );
   });
 
-  require(process.argv[2]);
+  require(scriptPath);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+module.exports = { run };

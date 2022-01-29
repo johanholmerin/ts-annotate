@@ -1,11 +1,20 @@
 {
-  "scripts": {
-    "analyze": "(cd example && ../run.js ./example/1.js > map.json)",
-    "update": "./update.js ./example/map.json"
+  "name": "ts-annotate",
+  "version": "0.1.0",
+  "description": "Auto-annotate TypeScript based on runtime profiling",
+  "author": "Johan Holmerin <johan@holmer.in>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/johanholmerin/ts-annotate.git"
+  },
+  "engines": {
+    "node": ">=14"
   },
   "dependencies": {
     "@babel/parser": "^7.16.12",
     "@babel/traverse": "^7.16.10",
+    "commander": "^9.0.0",
     "magic-string": "^0.25.7"
   }
 }

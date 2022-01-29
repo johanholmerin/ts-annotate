@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+const path = require('path');
 const fs = require('fs/promises');
 const parser = require('@babel/parser');
 const traverse = require('@babel/traverse').default;
@@ -12,10 +12,20 @@ function createUnion(types) {
   return types.join(' | ');
 }
 
-async function main() {
-  const map = require(process.argv[2]);
+async function loadMap() {
+  try {
+    return require(path.resolve(process.cwd(), './ts-annotate-map.json'));
+  } catch (_) {
+    throw new Error('Failed to load ts-annotate-map.json');
+  }
+}
+
+async function apply(files) {
+  const map = await loadMap();
 
   for (const { url, entries } of map) {
+    if (!files.includes(url)) continue;
+
     const code = await fs.readFile(url, 'utf8');
     const ast = parser.parse(code);
     const ms = new MagicString(code);
@@ -47,7 +57,4 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+module.exports = { apply };

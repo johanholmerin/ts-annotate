@@ -13,3 +13,5 @@ foo(1.5);
 foo([1]);
 foo('some string');
 foo(new Rectangle());
+
+console.log('log test');
