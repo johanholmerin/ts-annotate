@@ -2,5 +2,5 @@ node_modules
 .DS_Store
 *.log*
 ts-annotate-map.json
-tests/*/output.ts
+tests/*/output.js
 tests/*/ts-annotate-map.json

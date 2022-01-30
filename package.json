@@ -14,7 +14,7 @@
   },
   "scripts": {
     "test": "./scripts/test.sh",
-    "clean": "rm -f tests/*/{output.ts,ts-annotate-map.json}"
+    "clean": "rm -f tests/*/{output.js,ts-annotate-map.json}"
   },
   "dependencies": {
     "@babel/parser": "^7.16.12",

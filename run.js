@@ -58,7 +58,7 @@ async function run(scriptPath) {
     );
   });
 
-  require(scriptPath);
+  await import(scriptPath);
 }
 
 module.exports = { run };
