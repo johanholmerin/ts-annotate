@@ -28,7 +28,7 @@ add(1, 2);
 
 ```sh
 # 1. Generate type data by running the code
-npx ts-annotate run ./index.js
+npx ts-annotate run ./src/index.js
 
 # 2. Add type declaration to source code
 npx ts-annotate apply ./src/**/*.js
