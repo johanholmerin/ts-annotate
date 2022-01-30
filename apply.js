@@ -27,7 +27,9 @@ async function apply(files) {
     if (!files.includes(url)) continue;
 
     const code = await fs.readFile(url, 'utf8');
-    const ast = parser.parse(code);
+    const ast = parser.parse(code, {
+      sourceType: 'module',
+    });
     const ms = new MagicString(code);
 
     traverse(ast, {
