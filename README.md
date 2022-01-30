@@ -1,6 +1,28 @@
 # ts-annotate
 
-Add TypeScript declarations based on v8 runtime profiling
+Automatically add TypeScript declaration based on actual types passed at runtime, as determined by [V8][v8-profiling].
+
+## Example
+
+#### Before
+
+```javascript
+function add(a, b) {
+  return a + b;
+}
+
+add(1, 2);
+```
+
+#### After
+
+```javascript
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+add(1, 2);
+```
 
 ## Instructions
 
@@ -26,7 +48,7 @@ Only simple types are inferred - objects are `Record<string, any>`, arrays
 
 ## Commands
 
-- `run` - Same as running `node ./index.js` but saves type data to `ts-annotate-map.json`
+- `run` - Same as running `node` but saves type data to `ts-annotate-map.json`
 - `apply` - Adds type declarations to the specified files using data in `ts-annotate-map.json`
 
 ## Passing flags to Node
@@ -38,3 +60,5 @@ node --flag ./node_modules/.bin/ts-annotate ...
 ## Prior work
 
 - https://github.com/fhinkel/type-profile
+
+[v8-profiling]: https://docs.google.com/document/d/1JY7pUCAk8gegyi6UkIdln6j_AeJqQucZg92advaMJY4/edit
