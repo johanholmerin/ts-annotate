@@ -1,6 +1,6 @@
 {
   "name": "ts-annotate",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Auto-annotate TypeScript based on runtime profiling",
   "author": "Johan Holmerin <johan@holmer.in>",
   "license": "MIT",
