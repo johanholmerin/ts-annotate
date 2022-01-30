@@ -10,6 +10,9 @@ npx ts-annotate run ./index.js
 
 # 2. Add type declaration to source code
 npx ts-annotate apply ./src/**/*.js
+
+# 3. Rename .js to .ts
+# 4. Cleanup/improve types
 ```
 
 ## Supported types

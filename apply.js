@@ -32,27 +32,36 @@ async function apply(files) {
     });
     const ms = new MagicString(code);
 
-    traverse(ast, {
-      FunctionDeclaration(path) {
-        const returnType = findType(entries, path.node.end - 1);
-        let funcEnd = path.node.body.start;
-        // Explicit support for the common case of a space between ) & {
-        if (code[funcEnd - 1] === ' ') {
-          funcEnd--;
-        }
-        if (returnType) {
-          let dec = `: ${createUnion(returnType.types)}`;
-          ms.appendLeft(funcEnd, dec);
-        }
+    function addFuncTypes(path) {
+      const returnType = findType(entries, path.node.end - 1);
+      let funcEnd = path.node.body.start;
+      // Explicit support for the common case of a space between ) & {
+      if (code[funcEnd - 1] === ' ') {
+        funcEnd--;
+      }
+      if (returnType) {
+        let dec = `: ${createUnion(returnType.types)}`;
+        ms.appendLeft(funcEnd, dec);
+      }
 
-        path.node.params.forEach((param) => {
-          const type = findType(entries, param.start);
-          if (type) {
-            const dec = `: ${createUnion(type.types)}`;
-            ms.appendRight(param.end, dec);
-          }
-        });
-      },
+      path.node.params.forEach((param) => {
+        let paramPosition = param.start;
+        let typePosition = param.end;
+        if (param.type === 'AssignmentPattern') {
+          paramPosition = param.end - 1;
+          typePosition = param.left.end;
+        }
+        const type = findType(entries, paramPosition);
+        if (type) {
+          const dec = `: ${createUnion(type.types)}`;
+          ms.appendRight(typePosition, dec);
+        }
+      });
+    }
+
+    traverse(ast, {
+      FunctionDeclaration: addFuncTypes,
+      FunctionExpression: addFuncTypes,
     });
 
     fs.writeFile(url, ms.toString());
