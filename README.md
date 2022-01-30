@@ -1,8 +1,6 @@
 # ts-annotate
 
-Automatically add TypeScript declaration based on actual types passed at runtime, as determined by [V8][v8-profiling].
-
-## Example
+Automatically adds TypeScript declarations based on actual types passed at runtime, as determined by [V8][v8-profiling].
 
 #### Before
 
