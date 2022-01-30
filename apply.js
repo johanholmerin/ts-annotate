@@ -73,9 +73,18 @@ async function apply(files) {
       node.params.forEach((param) => {
         let paramPosition = param.start;
         let typePosition = param.end;
+        let node = param;
         if (param.type === 'AssignmentPattern') {
           paramPosition = param.end - 1;
           typePosition = param.left.end;
+          node = param.left;
+        }
+        if (node.type === 'ObjectPattern' || node.type === 'ArrayPattern') {
+          if (param.type === 'AssignmentPattern') {
+            paramPosition = param.end - 1;
+          } else {
+            paramPosition = node.end - 1;
+          }
         }
         const type = findType(entries, paramPosition);
         if (type) {
