@@ -20,6 +20,31 @@ async function loadMap() {
   }
 }
 
+function getFuncEnd(code, node) {
+  let funcEnd = node.body.start;
+
+  if (node.type === 'ArrowFunctionExpression') {
+    while (code[funcEnd] !== '=' && code[funcEnd + 1] !== '>') {
+      funcEnd--;
+    }
+  }
+
+  // Explicit support for the common case of a space between ) & {
+  if (code[funcEnd - 1] === ' ') {
+    funcEnd--;
+  }
+
+  return funcEnd;
+}
+
+function needParens(code, node) {
+  return (
+    node.type === 'ArrowFunctionExpression' &&
+    node.params.length === 1 &&
+    code[node.start] !== '('
+  );
+}
+
 async function apply(files) {
   const map = await loadMap();
 
@@ -32,19 +57,20 @@ async function apply(files) {
     });
     const ms = new MagicString(code);
 
-    function addFuncTypes(path) {
-      const returnType = findType(entries, path.node.end - 1);
-      let funcEnd = path.node.body.start;
-      // Explicit support for the common case of a space between ) & {
-      if (code[funcEnd - 1] === ' ') {
-        funcEnd--;
-      }
+    function addFuncTypes({ node }) {
+      const returnType = findType(entries, node.end - 1);
+      const funcEnd = getFuncEnd(code, node);
       if (returnType) {
-        let dec = `: ${createUnion(returnType.types)}`;
+        const dec = `: ${createUnion(returnType.types)}`;
         ms.appendLeft(funcEnd, dec);
       }
 
-      path.node.params.forEach((param) => {
+      if (needParens(code, node)) {
+        ms.appendLeft(node.start, '(');
+        ms.appendRight(node.params[0].end, ')');
+      }
+
+      node.params.forEach((param) => {
         let paramPosition = param.start;
         let typePosition = param.end;
         if (param.type === 'AssignmentPattern') {
@@ -62,6 +88,7 @@ async function apply(files) {
     traverse(ast, {
       FunctionDeclaration: addFuncTypes,
       FunctionExpression: addFuncTypes,
+      ArrowFunctionExpression: addFuncTypes,
     });
 
     fs.writeFile(url, ms.toString());
