@@ -45,6 +45,10 @@ function needParens(code, node) {
   );
 }
 
+function isConstructor(node) {
+  return node.type === 'ClassMethod' && node.kind === 'constructor';
+}
+
 async function apply(files) {
   const map = await loadMap();
 
@@ -58,11 +62,13 @@ async function apply(files) {
     const ms = new MagicString(code);
 
     function addFuncTypes({ node }) {
-      const returnType = findType(entries, node.end - 1);
-      const funcEnd = getFuncEnd(code, node);
-      if (returnType) {
-        const dec = `: ${createUnion(returnType.types)}`;
-        ms.appendLeft(funcEnd, dec);
+      if (!isConstructor(node)) {
+        const returnType = findType(entries, node.end - 1);
+        const funcEnd = getFuncEnd(code, node);
+        if (returnType) {
+          const dec = `: ${createUnion(returnType.types)}`;
+          ms.appendLeft(funcEnd, dec);
+        }
       }
 
       if (needParens(code, node)) {
@@ -98,6 +104,7 @@ async function apply(files) {
       FunctionDeclaration: addFuncTypes,
       FunctionExpression: addFuncTypes,
       ArrowFunctionExpression: addFuncTypes,
+      ClassMethod: addFuncTypes,
     });
 
     fs.writeFile(url, ms.toString());
