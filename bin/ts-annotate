@@ -15,6 +15,7 @@ program
 program
   .command('run')
   .description('Runs <file> and saves profile data to ts-annotate-map.json')
+  .allowUnknownOption()
   .argument('<file>')
   .action((file) => {
     const absolutePath = path.resolve(file);
@@ -29,6 +30,7 @@ program
   .description(
     'Adds type annotations to <files> using data from ts-annotate-map.json'
   )
+  .allowUnknownOption()
   .argument('<files>')
   .action((_, __, { args }) => {
     const absolutePaths = args.map((arg) => path.resolve(arg));
