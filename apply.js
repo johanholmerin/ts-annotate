@@ -8,8 +8,17 @@ function findType(entries, start) {
   return entries.find(({ offset }) => offset === start);
 }
 
+const FUNC_TYPE = '(...args: any[]) => any';
+
 function createUnion(types) {
-  return types.join(' | ');
+  return types
+    .map((type) => {
+      if (types.length > 1 && type === FUNC_TYPE) {
+        return `(${type})`;
+      }
+      return type;
+    })
+    .join(' | ');
 }
 
 async function loadMap() {
