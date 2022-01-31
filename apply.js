@@ -62,18 +62,16 @@ async function apply(files) {
     const ms = new MagicString(code);
 
     function addFuncTypes({ node }) {
+      let addedType = false;
+
       if (!isConstructor(node)) {
         const returnType = findType(entries, node.end - 1);
         const funcEnd = getFuncEnd(code, node);
         if (returnType) {
           const dec = `: ${createUnion(returnType.types)}`;
           ms.appendLeft(funcEnd, dec);
+          addedType = true;
         }
-      }
-
-      if (needParens(code, node)) {
-        ms.appendLeft(node.start, '(');
-        ms.appendRight(node.params[0].end, ')');
       }
 
       node.params.forEach((param) => {
@@ -96,8 +94,14 @@ async function apply(files) {
         if (type) {
           const dec = `: ${createUnion(type.types)}`;
           ms.appendRight(typePosition, dec);
+          addedType = true;
         }
       });
+
+      if (addedType && needParens(code, node)) {
+        ms.appendLeft(node.start, '(');
+        ms.appendLeft(node.params[0].end, ')');
+      }
     }
 
     traverse(ast, {
