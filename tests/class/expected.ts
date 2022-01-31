@@ -1,4 +1,4 @@
-function foo(x: Rec): undefined {}
+function foo(x: Rec): void {}
 
 class Rec {}
 

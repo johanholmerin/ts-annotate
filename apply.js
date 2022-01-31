@@ -9,6 +9,9 @@ function findType(entries, start) {
 }
 
 const FUNC_TYPE = '(...args: any[]) => any';
+const RETURN_TYPE_MAP = {
+  undefined: 'void',
+};
 
 function createUnion(types) {
   return types
@@ -88,9 +91,12 @@ async function apply(files) {
 
       if (!isConstructor(node)) {
         const returnType = findType(entries, node.end - 1);
-        const funcEnd = getFuncEnd(code, node);
+        let funcEnd = getFuncEnd(code, node);
         if (returnType) {
-          const dec = `: ${createUnion(returnType.types)}`;
+          const returnTypes = returnType.types.map(
+            (type) => RETURN_TYPE_MAP[type] ?? type
+          );
+          const dec = `: ${createUnion(returnTypes)}`;
           ms.appendRight(funcEnd, dec);
           addedType = true;
         }

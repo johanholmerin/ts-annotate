@@ -1,4 +1,4 @@
-function foo(x: ((...args: any[]) => any) | undefined): undefined {}
+function foo(x: ((...args: any[]) => any) | undefined): void {}
 
 foo(() => {});
 foo(undefined);

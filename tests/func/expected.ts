@@ -1,3 +1,3 @@
-function foo(x: (...args: any[]) => any): undefined {}
+function foo(x: (...args: any[]) => any): void {}
 
 foo(() => {});

@@ -1,3 +1,3 @@
-function foo(x: any[]): undefined {}
+function foo(x: any[]): void {}
 
 foo([]);

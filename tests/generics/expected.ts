@@ -1,4 +1,4 @@
-function foo(x: Promise<any> | Set<any> | Map<any, any> | WeakSet<any> | WeakMap<any, any>): undefined {}
+function foo(x: Promise<any> | Set<any> | Map<any, any> | WeakSet<any> | WeakMap<any, any>): void {}
 
 foo(Promise.resolve());
 foo(new Set());

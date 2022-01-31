@@ -1,3 +1,3 @@
-function foo(x: Record<string, any>): undefined {}
+function foo(x: Record<string, any>): void {}
 
 foo(require('./output.ts'));

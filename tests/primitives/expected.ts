@@ -1,4 +1,4 @@
-function foo(x: number | string | boolean | symbol | undefined | null): undefined {}
+function foo(x: number | string | boolean | symbol | undefined | null): void {}
 
 foo(1.5);
 foo('some string');
