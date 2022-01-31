@@ -44,13 +44,15 @@ async function run(scriptPath) {
 
     await post('Profiler.stop');
 
-    const filtered = result.map(({ url, entries }) => ({
-      url: url.slice('file://'.length),
-      entries: entries.map(({ offset, types }) => ({
-        offset,
-        types: types.map(({ name }) => TS_TYPE_MAP[name] ?? name),
-      })),
-    }));
+    const filtered = result
+      .filter(({ url }) => url.startsWith('file://'))
+      .map(({ url, entries }) => ({
+        url: url.slice('file://'.length),
+        entries: entries.map(({ offset, types }) => ({
+          offset,
+          types: types.map(({ name }) => TS_TYPE_MAP[name] ?? name),
+        })),
+      }));
 
     await fs.writeFile(
       path.resolve(process.cwd(), './ts-annotate-map.json'),
