@@ -38,11 +38,24 @@ function getFuncEnd(code, node) {
 }
 
 function needParens(code, node) {
-  return (
-    node.type === 'ArrowFunctionExpression' &&
-    node.params.length === 1 &&
-    code[node.start] !== '('
-  );
+  if (node.type !== 'ArrowFunctionExpression') {
+    return false;
+  }
+
+  if (node.params.length !== 1) {
+    return false;
+  }
+
+  let funcStart = node.start;
+
+  while (funcStart < node.params[0].start) {
+    if (code[funcStart] === '(') {
+      return false;
+    }
+    funcStart++;
+  }
+
+  return true;
 }
 
 function isConstructor(node) {
@@ -69,7 +82,7 @@ async function apply(files) {
         const funcEnd = getFuncEnd(code, node);
         if (returnType) {
           const dec = `: ${createUnion(returnType.types)}`;
-          ms.appendLeft(funcEnd, dec);
+          ms.appendRight(funcEnd, dec);
           addedType = true;
         }
       }
@@ -93,13 +106,13 @@ async function apply(files) {
         const type = findType(entries, paramPosition);
         if (type) {
           const dec = `: ${createUnion(type.types)}`;
-          ms.appendRight(typePosition, dec);
+          ms.prependLeft(typePosition, dec);
           addedType = true;
         }
       });
 
       if (addedType && needParens(code, node)) {
-        ms.appendLeft(node.start, '(');
+        ms.appendLeft(node.params[0].start, '(');
         ms.appendLeft(node.params[0].end, ')');
       }
     }
