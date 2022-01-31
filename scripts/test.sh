@@ -4,7 +4,7 @@ set -e
 
 shopt -s nullglob
 
-for dir in ./tests/*; do
+for dir in ./tests/${1:-*}; do
   (
     cd "$dir"
     cp ./input.js ./output.ts
